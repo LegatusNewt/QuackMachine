@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     tools:context="legatetechnology.quackmachine.Quacktivity"
     android:background="@color/dim_foreground_material_dark"
-    android:touchscreenBlocksFocus="false">
+    android:touchscreenBlocksFocus="false"
+    android:visibility="visible"
+    android:id="@+id/main">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
@@ -70,4 +72,20 @@
         android:paddingStart="100px"
         android:paddingEnd="100px"
         android:progress="5" />
+
+    <com.szugyi.circlemenu.view.CircleLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rMenu_context"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/textView"
+        android:forceHasOverlappingRendering="false"
+        android:background="@drawable/circle_menu_back"
+        android:layout_margin="25dp"
+        android:visibility="visible"
+        android:clickable="false"
+        android:focusable="false">
+        <include layout="@layout/menu_items"/>
+    </com.szugyi.circlemenu.view.CircleLayout>
+
 </RelativeLayout>
