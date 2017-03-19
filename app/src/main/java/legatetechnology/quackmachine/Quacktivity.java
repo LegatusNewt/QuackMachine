@@ -4,6 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.Image;
 import android.media.SoundPool;
@@ -19,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -31,10 +35,11 @@ import java.util.HashMap;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class Quacktivity extends AppCompatActivity implements Animator.AnimatorListener, View.OnLongClickListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class Quacktivity extends AppCompatActivity implements CircleLayout.OnItemSelectedListener, CircleLayout.OnItemClickListener, Animator.AnimatorListener, View.OnLongClickListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     private int quack_factor = 0;
     private SeekBar seek_quackFactor;
     private TextView tv_quackFactor;
+    private TextView tv_qTitle;
     private ImageButton ib_quacker;
     private CircleLayout circle_selector;
     private View mainLayout;
@@ -44,13 +49,19 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
     private AnimatorSet animSetXYClose;
     private ViewGroup.LayoutParams origParams;
     private ViewGroup.LayoutParams noParams;
+    private String birdState = "duck";
 
     //Quack sources
     private int[] quackSource = {R.raw.quack_n_5, R.raw.quack_n_4, R.raw.quack_n_3, R.raw.quack_n_2
             , R.raw.quack_n_1, R.raw.quack_0, R.raw.quack_1, R.raw.quack_2, R.raw.quack_3, R.raw.quack_4, R.raw.quack_5};
 
+    private int gooseSource = R.raw.goose;
+    private int pigeonSource = R.raw.pigeon;
+
     //HashMap for associating quacksource with loaded quack file in the soundpool
     private HashMap<Integer, Integer> quacks;
+    private HashMap<Integer, Integer> gooseCall;
+    private HashMap<Integer, Integer> pigeonCoo;
     private SoundPool mySound;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -72,6 +83,7 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
         tv_quackFactor = (TextView) findViewById(R.id.tv_quackFactor);
         ib_quacker = (ImageButton) findViewById(R.id.ib_quacker);
         circle_selector = (CircleLayout) findViewById(R.id.rMenu_context);
+        tv_qTitle = (TextView) findViewById(R.id.tv_title);
         mainLayout = findViewById(R.id.main);
 
         //Listeners
@@ -79,9 +91,13 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
         ib_quacker.setOnLongClickListener(this);
         seek_quackFactor.setOnSeekBarChangeListener(this);
         mainLayout.setOnClickListener(this);
+        circle_selector.setOnItemClickListener(this);
+        circle_selector.setOnItemSelectedListener(this);
 
         //initialize HashMap
         quacks = new HashMap<Integer, Integer>();
+        pigeonCoo = new HashMap<Integer, Integer>();
+        gooseCall = new HashMap<Integer, Integer>();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -107,6 +123,8 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
         for (int res : quackSource) {
             quacks.put(res, mySound.load(this, res, 1));
         }
+        gooseCall.put(gooseSource,mySound.load(this,gooseSource,1));
+        pigeonCoo.put(pigeonSource,mySound.load(this,pigeonSource,1));
     }
 
     /**
@@ -195,15 +213,58 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
         }
     }
 
+    /**
+     * Set the state of the Quacker
+     *      duck,goose,pigeon
+     */
+    private void setState(String bird)
+    {
+        switch(bird){
+            case "duck":
+                ib_quacker.setImageResource(R.drawable.duck);
+                seek_quackFactor.setVisibility(View.VISIBLE);
+                tv_qTitle.setVisibility(View.VISIBLE);
+                tv_quackFactor.setVisibility(View.VISIBLE);
+                break;
+            case "goose":
+                ib_quacker.setImageResource(R.drawable.feature_goose);
+                seek_quackFactor.setVisibility(View.INVISIBLE);
+                tv_qTitle.setVisibility(View.INVISIBLE);
+                tv_quackFactor.setVisibility(View.INVISIBLE);
+                break;
+            case "pigeon":
+                ib_quacker.setImageResource(R.drawable.feature_pigeon);
+                seek_quackFactor.setVisibility(View.INVISIBLE);
+                tv_qTitle.setVisibility(View.INVISIBLE);
+                tv_quackFactor.setVisibility(View.INVISIBLE);
+                break;
+        }
+        birdState = bird;
+        Toast toast = Toast.makeText(this, birdState, Toast.LENGTH_SHORT);
+        toast.show();
+    }
 
     /**
      * Plays quacks using the SoundPool that was created before
      */
     private void play_Quack() {
-        if (quack_factor < quackSource.length)
-            mySound.play(quacks.get(quackSource[quack_factor]), 1, 1, 1, 0, 1.0f);
-        else
-            mySound.play(quacks.get(quackSource[0]), 1, 1, 1, 0, 1.0f);
+        switch(birdState){
+            case "duck":{
+                if (quack_factor < quackSource.length)
+                    mySound.play(quacks.get(quackSource[quack_factor]), 1, 1, 1, 0, 1.0f);
+                else
+                    mySound.play(quacks.get(quackSource[0]), 1, 1, 1, 0, 1.0f);
+                break;
+            }
+            case "goose":{
+                mySound.play(gooseCall.get(gooseSource),1,1,1,0,1.0f);
+                break;
+            }
+            case "pigeon":{
+                mySound.play(pigeonCoo.get(pigeonSource),1,1,1,0,1.0f);
+                break;
+            }
+        }
     }
 
     @Override
@@ -227,46 +288,6 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Quacktivity Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://legatetechnology.quackmachine/http/host/path")
-        );
-        AppIndex.AppIndexApi.start(client, viewAction);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        Action viewAction = Action.newAction(
-                Action.TYPE_VIEW, // TODO: choose an action type.
-                "Quacktivity Page", // TODO: Define a title for the content shown.
-                // TODO: If you have web page content that matches this app activity's content,
-                // make sure this auto-generated web page URL is correct.
-                // Otherwise, set the URL to null.
-                Uri.parse("http://host/path"),
-                // TODO: Make sure this auto-generated app URL is correct.
-                Uri.parse("android-app://legatetechnology.quackmachine/http/host/path")
-        );
-        AppIndex.AppIndexApi.end(client, viewAction);
-        client.disconnect();
-    }
-
     /**
      * On Animation end toggle the size of the context menu so that it doesn't interfere with
      * onclick actions
@@ -279,13 +300,6 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
             toggleSize();
     }
 
-
-    @Override
-    public void onAnimationStart(Animator animation) {
-        if(menuState)
-            toggleSize();
-    }
-
     @Override
     public void onAnimationCancel(Animator animation) {
 
@@ -294,6 +308,55 @@ public class Quacktivity extends AppCompatActivity implements Animator.AnimatorL
     @Override
     public void onAnimationRepeat(Animator animation) {
 
+    }
+
+
+    @Override
+    public void onAnimationStart(Animator animation) {
+        if(menuState)
+            toggleSize();
+    }
+
+    @Override
+    public void onItemClick(View view) {
+        switch(view.getId()){
+            case R.id.menu_duck:
+            {
+                setState("duck");
+                break;
+            }
+            case R.id.menu_goose:
+            {
+                setState("goose");
+                break;
+            }
+            case R.id.menu_pigeon:
+            {
+                setState("pigeon");
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onItemSelected(View view) {
+        switch(view.getId()){
+            case R.id.menu_duck:
+            {
+                setState("duck");
+                break;
+            }
+            case R.id.menu_goose:
+            {
+                setState("goose");
+                break;
+            }
+            case R.id.menu_pigeon:
+            {
+                setState("pigeon");
+                break;
+            }
+        }
     }
 }
 

@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
-    <ImageButton android:src="@drawable/feature_duck_round"
+    <ImageView android:src="@drawable/feature_duck_round"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:background="@android:color/transparent"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter">
-    </ImageButton>
-    <ImageButton android:layout_width="100dp"
+        android:scaleType="fitCenter"
+        android:id="@+id/menu_duck"
+        android:clickable="false">
+    </ImageView>
+    <ImageView android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/feature_goose_round"
         android:background="@android:color/transparent"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter">
+        android:scaleType="fitCenter"
+        android:id="@+id/menu_goose"
+        android:clickable="false">
 
-    </ImageButton>
-    <ImageButton android:layout_width="100dp"
+    </ImageView>
+    <ImageView android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/feature_pigeon_round"
         android:background="@android:color/transparent"
         android:clickable="false"
         android:focusable="false"
         android:scaleType="fitCenter"
-        android:adjustViewBounds="true">
+        android:adjustViewBounds="true"
+        android:id="@+id/menu_pigeon">
 
-    </ImageButton>
+    </ImageView>
 
 
 </merge>
